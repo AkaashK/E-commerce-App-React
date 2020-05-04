@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../styles.css";
+
 import Base from "./Base";
 import Card from "./Card";
-import { loadCart } from "./helper/cartHelper";
 import Payment from "./Payment";
+
+import { loadCart } from "./helper/cartHelper";
 
 const Home = () => {
   const [products, setProducts] = useState([]);

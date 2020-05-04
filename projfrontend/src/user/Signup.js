@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import Base from "../core/Base";
 import { Link } from "react-router-dom";
+
+import Base from "../core/Base";
 import { signup } from "../auth/helper";
 
 const Signup = () => {
@@ -10,9 +11,10 @@ const Signup = () => {
     password: "",
     error: "",
     success: false,
+    loading: false,
   });
 
-  const { name, email, password, error, success } = values;
+  const { name, email, password, error, success, loading } = values;
 
   const handleChange = (name) => (event) => {
     setValues({ ...values, error: false, [name]: event.target.value });
@@ -20,7 +22,7 @@ const Signup = () => {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    setValues({ ...values, error: false });
+    setValues({ ...values, error: false, loading: true });
     signup({ name, email, password })
       .then((data) => {
         if (data.error) {
@@ -36,7 +38,17 @@ const Signup = () => {
           });
         }
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
+  };
+
+  const loadingMessage = () => {
+    return (
+      loading && (
+        <div className="alert alert-info">
+          <h2>Loading...</h2>
+        </div>
+      )
+    );
   };
 
   const signUpForm = () => {
@@ -114,6 +126,7 @@ const Signup = () => {
 
   return (
     <Base title="Sign up page" description="A page for user to sign up!">
+      {loadingMessage()}
       {successMessage()}
       {errorMessage()}
       {signUpForm()}

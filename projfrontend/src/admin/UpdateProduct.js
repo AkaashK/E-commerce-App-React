@@ -117,7 +117,7 @@ const UpdateProduct = ({ match }) => {
     </div>
   );
 
-  const createProductForm = () => (
+  const updateProductForm = () => (
     <form>
       <span>Post photo</span>
       <div className="form-group">
@@ -205,7 +205,7 @@ const UpdateProduct = ({ match }) => {
       <div className="row bg-dark text-white rounded">
         <div className="col-md-8 offset-md-2">
           {successMessage()}
-          {createProductForm()}
+          {updateProductForm()}
         </div>
       </div>
     </Base>

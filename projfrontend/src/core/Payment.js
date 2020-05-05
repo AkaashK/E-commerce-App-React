@@ -7,6 +7,7 @@ import { isAuthenticated } from "../auth/helper";
 import { getmeToken, processPayment } from "./helper/paymentHelper";
 import { cartEmpty } from "./helper/cartHelper";
 import { createOrder } from "./helper/orderHelper";
+import { Link } from "react-router-dom";
 
 const userId = isAuthenticated() && isAuthenticated().user._id;
 const token = isAuthenticated() && isAuthenticated().token;
@@ -51,8 +52,14 @@ const Payment = ({ products, setReload = (f) => f, reload = undefined }) => {
               Buy
             </button>
           </div>
+        ) : info.success ? (
+          <div>
+            <h4>Payment Done Successfully</h4>
+            <Link to="/">Return to purchase</Link> <br />
+            <Link to="/user/dashboard">View Purchase list</Link>
+          </div>
         ) : (
-          <h3>Please Login or add something to cart</h3>
+          <h4>please login or add something to the cart</h4>
         )}
       </div>
     );
@@ -106,6 +113,7 @@ const Payment = ({ products, setReload = (f) => f, reload = undefined }) => {
       );
     }
   };
+
   return (
     <div>
       {isLoading()}

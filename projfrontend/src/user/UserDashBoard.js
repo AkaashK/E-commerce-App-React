@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from "react";
+
 import Base from "../core/Base";
+import PurchaseList from "./PurchaseList";
+import Pagination from "./Pagination"
+
 import { isAuthenticated } from "../auth/helper";
 import { getUserPurchaseList } from "./helper/userPurchaseListHelper";
 
+//to set select lists per page
+const selectOptions = [5, 10, 20, 30];
+
 const UserDashBoard = () => {
   const [purchaseList, setPurchaseList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [listsPerPage, setListsPerPage] = useState(5);
+
+  const totalLengthOfPosts = purchaseList.length;
+  const indexOfLastPost = currentPage * listsPerPage;
+
   const {
     user: { name, email },
   } = isAuthenticated();
@@ -13,15 +26,30 @@ const UserDashBoard = () => {
     const userId = isAuthenticated() && isAuthenticated().user._id;
     const token = isAuthenticated() && isAuthenticated().token;
     getPurchaseList(userId, token);
-  }, [purchaseList]);
+  }, []);
 
   const getPurchaseList = (userId, token) => {
     getUserPurchaseList(userId, token)
       .then((response) => {
-        console.log(response);
         setPurchaseList(response);
       })
       .catch((error) => console.log(error));
+  };
+
+  //to get current list to display
+  const currentLists = () => {
+    const indexOfFirstPost = indexOfLastPost - listsPerPage;
+    return purchaseList.slice(indexOfFirstPost, indexOfLastPost);
+  };
+  //set current page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  //to enable next button
+  const enableButton = () => {
+    return (
+      indexOfLastPost > listsPerPage * (currentPage - 1) &&
+      indexOfLastPost < totalLengthOfPosts
+    );
   };
 
   return (
@@ -47,33 +75,36 @@ const UserDashBoard = () => {
         </div>
         <div className="col-8">
           <h3 className="card-header bg-success">User Purchase List</h3>
-          {isAuthenticated() &&
-            purchaseList.map((list, index) => {
-              return (
-                <li className="list-group-item text-success" key={index}>
-                  {list.products.map((product, index) => {
-                    return (
-                      <li className="list-group-item" key={index}>
-                        <span className="text-info">Product Name:</span>
-                        {product.name}
-                        <br />
-                        <span className="text-info">Product Price:</span>
-                        {product.price}
-                        <br />
-                      </li>
-                    );
-                  })}
-                  <span className="text-info">Ordered Date: </span>
-                  {list.createdAt.split("T")[0]}
-                  <br />
-                  <span className="text-info">Order Time: </span>
-                  {list.createdAt.split("T")[1].split(".")[0]}
-                  <br />
-                  <span className="text-info">Order Status: </span>
-                  {list.status}
-                </li>
-              );
-            })}
+          {isAuthenticated() && purchaseList.length > 0 && (
+            <div>
+              <PurchaseList purchaseList={currentLists()} />
+              <button
+                className="btn btn-sm btn-info"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Prev
+              </button>
+              <button
+                className="btn btn-sm btn-info"
+                disabled={!enableButton()}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+              <Pagination
+                postsPerPage={listsPerPage}
+                totalPosts={totalLengthOfPosts}
+                paginate={paginate}
+              />
+              <br />
+              <select className="bg-info text-white px-3" onChange={(event) => setListsPerPage(event.target.value)}>
+                {selectOptions.map((value) => (
+                  <option className="" key={value}>{value}</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
     </Base>
